@@ -17,22 +17,49 @@
 
 package org.apache.seatunnel.connectors.seatunnel.clickhouse.sink.inject;
 
+import com.clickhouse.client.ClickHouseDataType;
+import com.clickhouse.client.data.ClickHouseBitmap;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+@Slf4j
 public class StringInjectFunction implements ClickhouseFieldInjectFunction {
+
+    private String fieldType;
 
     @Override
     public void injectFields(PreparedStatement statement, int index, Object value) throws SQLException {
-        statement.setString(index, value.toString());
+
+        ObjectMapper mapper = new ObjectMapper();
+        log.info("clickhouse-sink-inject index:{},value:{}", index, value);
+        try {
+            if ("AggregateFunction(groupBitmap, UInt32)".equals(fieldType)) {
+                statement.setObject(index, mapper.readValue(value.toString(), int[].class));
+            } else {
+                statement.setString(index, value.toString());
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public boolean isCurrentFieldType(String fieldType) {
+        this.fieldType = fieldType;
+
         return "String".equals(fieldType)
-            || "Int128".equals(fieldType)
-            || "UInt128".equals(fieldType)
-            || "Int256".equals(fieldType)
-            || "UInt256".equals(fieldType);
+                || "Int128".equals(fieldType)
+                || "UInt128".equals(fieldType)
+                || "Int256".equals(fieldType)
+                || "UInt256".equals(fieldType)
+                || "AggregateFunction(groupBitmap, UInt32)".equals(fieldType);
+
     }
+
+
 }
