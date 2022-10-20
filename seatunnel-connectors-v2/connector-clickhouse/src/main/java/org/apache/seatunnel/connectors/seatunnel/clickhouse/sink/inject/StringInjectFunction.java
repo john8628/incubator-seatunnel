@@ -17,8 +17,6 @@
 
 package org.apache.seatunnel.connectors.seatunnel.clickhouse.sink.inject;
 
-import com.clickhouse.client.ClickHouseDataType;
-import com.clickhouse.client.data.ClickHouseBitmap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -51,15 +49,11 @@ public class StringInjectFunction implements ClickhouseFieldInjectFunction {
     @Override
     public boolean isCurrentFieldType(String fieldType) {
         this.fieldType = fieldType;
-
         return "String".equals(fieldType)
                 || "Int128".equals(fieldType)
                 || "UInt128".equals(fieldType)
                 || "Int256".equals(fieldType)
                 || "UInt256".equals(fieldType)
                 || "AggregateFunction(groupBitmap, UInt32)".equals(fieldType);
-
     }
-
-
 }
