@@ -77,6 +77,10 @@ Using as a multiplier for generating the next delay for backoff
 
 The amount of time to wait before attempting to retry a request to `Doris`
 
+### enable_upsert_delete [boolean]
+
+Whether to enable upsert/delete, only supports PrimaryKey model.
+
 ### doris.config [map]
 
 The parameter of the stream load `data_desc`, you can get more detail at this link:
@@ -104,6 +108,9 @@ sink {
           format = "JSON"
           strip_outer_array = true
         }
+        
+        // Support upsert/delete event synchronization (enable_upsert_delete=true), only supports PrimaryKey model.
+        enable_upsert_delete = true
     }
 }
 
@@ -126,6 +133,9 @@ sink {
           format = "CSV"
           column_separator = ","
         }
+        
+        // Support upsert/delete event synchronization (enable_upsert_delete=true), only supports PrimaryKey model.
+        enable_upsert_delete = true
     }
 }
 ```

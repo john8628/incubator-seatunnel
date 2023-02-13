@@ -82,7 +82,8 @@ public class DorisStreamLoadVisitor {
                 httpHelper.doHttpPut(
                         loadUrl,
                         joinRows(flushData.getRows(), flushData.getBytes().intValue()),
-                        getStreamLoadHttpHeader(flushData.getLabel()));
+                        getStreamLoadHttpHeader(
+                                flushData.getLabel(), flushData.getEnableUpsertDelete()));
         final String keyStatus = "Status";
         if (null == loadResult || !loadResult.containsKey(keyStatus)) {
             throw new DorisConnectorException(
@@ -239,7 +240,7 @@ public class DorisStreamLoadVisitor {
         return String.format("Basic %s", new String(encodedAuth));
     }
 
-    private Map<String, String> getStreamLoadHttpHeader(String label) {
+    private Map<String, String> getStreamLoadHttpHeader(String label, boolean enableDelete) {
         Map<String, String> headerMap = new HashMap<>();
         if (null != fieldNames
                 && !fieldNames.isEmpty()
@@ -256,6 +257,9 @@ public class DorisStreamLoadVisitor {
             for (Map.Entry<String, String> entry : sinkConfig.getStreamLoadProps().entrySet()) {
                 headerMap.put(entry.getKey(), String.valueOf(entry.getValue()));
             }
+        }
+        if (enableDelete) {
+            headerMap.put("hidden_columns", "__DORIS_DELETE_SIGN__");
         }
         headerMap.put("strip_outer_array", "true");
         headerMap.put("Expect", "100-continue");

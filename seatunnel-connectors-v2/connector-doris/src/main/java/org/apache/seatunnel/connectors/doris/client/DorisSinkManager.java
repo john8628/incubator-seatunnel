@@ -49,13 +49,14 @@ public class DorisSinkManager {
     private volatile Exception flushException;
     private int batchRowCount = 0;
     private long batchBytesSize = 0;
-
     private final Integer batchIntervalMs;
+    private boolean enableDelete;
 
     public DorisSinkManager(SinkConfig sinkConfig, List<String> fileNames) {
         this.sinkConfig = sinkConfig;
         this.batchList = new ArrayList<>();
         this.batchIntervalMs = sinkConfig.getBatchIntervalMs();
+        this.enableDelete = sinkConfig.isEnableUpsertDelete();
         dorisStreamLoadVisitor = new DorisStreamLoadVisitor(sinkConfig, fileNames);
     }
 
@@ -110,7 +111,7 @@ public class DorisSinkManager {
             return;
         }
         String label = createBatchLabel();
-        DorisFlushTuple tuple = new DorisFlushTuple(label, batchBytesSize, batchList);
+        DorisFlushTuple tuple = new DorisFlushTuple(label, batchBytesSize, batchList, enableDelete);
         for (int i = 0; i <= sinkConfig.getMaxRetries(); i++) {
             try {
                 Boolean successFlag = dorisStreamLoadVisitor.doStreamLoad(tuple);

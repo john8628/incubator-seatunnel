@@ -15,18 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.seatunnel.connectors.doris.client;
+package org.apache.seatunnel.connectors.doris.serialize;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import org.apache.seatunnel.api.table.type.SeaTunnelRow;
 
-import java.util.List;
+import java.io.IOException;
 
-@AllArgsConstructor
-@Data
-public class DorisFlushTuple {
-    private String label;
-    private Long bytes;
-    private List<byte[]> rows;
-    private Boolean enableUpsertDelete;
+public interface SeaTunnelRowSerializer {
+    String serialize(SeaTunnelRow seaTunnelRow) throws IOException;
 }

@@ -125,6 +125,11 @@ public class SinkConfig {
                     .noDefaultValue()
                     .withDescription(
                             "The amount of time to wait before attempting to retry a request to Doris");
+    public static final Option<Boolean> ENABLE_UPSERT_DELETE =
+            Options.key("enable_upsert_delete")
+                    .booleanType()
+                    .noDefaultValue()
+                    .withDescription("enable upsert delete for doris cdc");
 
     public enum StreamLoadFormat {
         CSV,
@@ -153,6 +158,7 @@ public class SinkConfig {
     private int maxRetries;
     private int retryBackoffMultiplierMs;
     private int maxRetryBackoffMs;
+    private boolean enableUpsertDelete;
 
     private final Map<String, String> streamLoadProps = new HashMap<>();
 
@@ -189,6 +195,9 @@ public class SinkConfig {
         }
         if (pluginConfig.hasPath(MAX_RETRY_BACKOFF_MS.key())) {
             sinkConfig.setMaxRetryBackoffMs(pluginConfig.getInt(MAX_RETRY_BACKOFF_MS.key()));
+        }
+        if (pluginConfig.hasPath(ENABLE_UPSERT_DELETE.key())) {
+            sinkConfig.setEnableUpsertDelete(pluginConfig.getBoolean(ENABLE_UPSERT_DELETE.key()));
         }
         parseSinkStreamLoadProperties(pluginConfig, sinkConfig);
         if (sinkConfig.streamLoadProps.containsKey(COLUMN_SEPARATOR)) {
